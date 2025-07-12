@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, FormEvent, ReactNode } from "react";
+import { useState, useEffect, useRef, FormEvent, ReactNode, Dispatch, SetStateAction } from "react";
 import InputField from "./InputField";
+import styles from "@/app/auth/auth.module.scss";
 
 interface FormProps {
   onSubmit: (data: string) => Promise<void>;
@@ -9,12 +10,12 @@ interface FormProps {
   errorMessage: string;
   placeholder: string;
   children: ReactNode;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
-const Form = ({ onSubmit, validate, errorMessage, placeholder, children }: FormProps) => {
+const Form = ({ onSubmit, validate, errorMessage, placeholder, children, setIsLoading }: FormProps) => {
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -44,13 +45,16 @@ const Form = ({ onSubmit, validate, errorMessage, placeholder, children }: FormP
 
   return (
     <form onSubmit={handleSubmit}>
-      <InputField
-        ref={inputRef}
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        error={error}
-        placeholder={placeholder}
-      />
+      <div>
+        <InputField
+          ref={inputRef}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder={placeholder}
+          className={`${styles.input} ${error ? styles.error : ""}`}
+        />
+        {error && <p className={styles.errorMessage}>{error}</p>}
+      </div>
       {children}
     </form>
   );
