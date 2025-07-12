@@ -16,7 +16,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           type="text"
           value={value}
           onChange={onChange}
-          placeholder="Enter phone number (e.g., 09123456789)"
+          placeholder={rest.placeholder || "Enter text"}
           className={`${styles.input} ${error ? styles.error : ""}`}
           {...rest}
         />
@@ -25,7 +25,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     );
   }
 );
-// for better debugging
+
 InputField.displayName = "InputField";
 
 export default InputField;
