@@ -4,10 +4,15 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import InputField from "./InputField";
 import Button from "./Button";
-import { setUserInStorage } from "@/utils/storage";
 import { User } from "@/types/user";
 
-export default function Form() {
+interface FormProps {
+  errorMessage: string;
+  placeholder: string;
+  fetchAndStoreUser: (phoneNumber: string) => Promise<User>;
+}
+
+const Form = ({ errorMessage, placeholder, fetchAndStoreUser }: FormProps) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,15 +25,15 @@ export default function Form() {
     }
   }, []);
 
-  const validatePhoneNumber = (phoneNumber: string): boolean => {
+  const validatePhone = (phone: string): boolean => {
     const phoneRegex = /^09\d{9}$/;
-    return phoneRegex.test(phoneNumber);
+    return phoneRegex.test(phone);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validatePhoneNumber(phoneNumber)) {
-      setError("Phone number must start with '09' and be 11 digits");
+    if (!validatePhone(phoneNumber)) {
+      setError(errorMessage);
       return;
     }
 
@@ -36,16 +41,7 @@ export default function Form() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://randomuser.me/api/?results=1&nat=us");
-      const data = await response.json();
-      const apiUser = data.results[0];
-      const user: User = {
-        phoneNumber,
-        phone: apiUser.phone || "",
-        name: `${apiUser.name?.title || ""} ${apiUser.name?.first || ""} ${apiUser.name?.last || ""}`.trim(),
-        email: apiUser.email || "",
-      };
-      setUserInStorage(user);
+      await fetchAndStoreUser(phoneNumber);
       router.push("/dashboard");
     } catch (err) {
       setError("Failed to fetch user data. Please try again.");
@@ -61,8 +57,11 @@ export default function Form() {
         value={phoneNumber}
         onChange={(e) => setPhoneNumber(e.target.value)}
         error={error}
+        placeholder={placeholder}
       />
       <Button isLoading={isLoading}>Login</Button>
     </form>
   );
-}
+};
+
+export default Form;
