@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import InputField from "./InputField";
 import Button from "./Button";
@@ -12,6 +12,13 @@ export default function Form() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const validatePhoneNumber = (phoneNumber: string): boolean => {
     const phoneRegex = /^09\d{9}$/;
@@ -33,10 +40,10 @@ export default function Form() {
       const data = await response.json();
       const apiUser = data.results[0];
       const user: User = {
-        phoneNumber, // User-entered phone number
-        phone: apiUser.phone || "", // API-provided phone number, fallback to empty string
-        name: `${apiUser.name?.title || ""} ${apiUser.name?.first || ""} ${apiUser.name?.last || ""}`.trim(), // Combine name fields
-        email: apiUser.email || "", // API-provided email, fallback to empty string
+        phoneNumber,
+        phone: apiUser.phone || "",
+        name: `${apiUser.name?.title || ""} ${apiUser.name?.first || ""} ${apiUser.name?.last || ""}`.trim(),
+        email: apiUser.email || "",
       };
       setUserInStorage(user);
       router.push("/dashboard");
@@ -50,11 +57,12 @@ export default function Form() {
   return (
     <form onSubmit={handleSubmit}>
       <InputField
+        ref={inputRef}
         value={phoneNumber}
         onChange={(e) => setPhoneNumber(e.target.value)}
         error={error}
       />
-      <Button disabled={isLoading}>Login</Button>
+      <Button isLoading={isLoading}>Login</Button>
     </form>
   );
 }

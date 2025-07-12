@@ -68,6 +68,7 @@
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.2s;
+      position: relative;
 
       &:hover {
         background-color: #005bb5;
@@ -76,6 +77,38 @@
       &:disabled {
         background-color: #cccccc;
         cursor: not-allowed;
+      }
+
+      &.loading {
+        background-color: #0070f3;
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+
+    .loader {
+      display: inline-block;
+      position: relative;
+      color: white;
+      font-size: 0.875rem;
+
+      &::after {
+        content: "";
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid white;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
     }
   }
